@@ -8,6 +8,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
   const isAdmin = profile?.role === 'admin'
 
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    setProfile(null)
+  }
+
   useEffect(() => {
     let mounted = true
 
@@ -51,5 +56,5 @@ export function useAuth() {
     }
   }, [])
 
-  return { profile, loading, isAdmin }
+  return { profile, loading, isAdmin, signOut }
 }
