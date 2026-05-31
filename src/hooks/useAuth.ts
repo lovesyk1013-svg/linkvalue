@@ -6,6 +6,7 @@ import type { Profile } from '@/types'
 export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const isAdmin = profile?.role === 'admin'
 
   useEffect(() => {
     let mounted = true
@@ -50,5 +51,5 @@ export function useAuth() {
     }
   }, [])
 
-  return { profile, loading }
+  return { profile, loading, isAdmin }
 }
