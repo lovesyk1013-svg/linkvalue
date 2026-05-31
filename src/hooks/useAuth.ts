@@ -9,6 +9,7 @@ export function useAuth() {
 
   useEffect(() => {
     let mounted = true
+
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
@@ -17,7 +18,7 @@ export function useAuth() {
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single()
+            .maybeSingle()
           if (mounted) setProfile(data)
         }
       } catch (e) {
@@ -26,6 +27,7 @@ export function useAuth() {
         if (mounted) setLoading(false)
       }
     }
+
     getSession()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -34,23 +36,19 @@ export function useAuth() {
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .single()
+          .maybeSingle()
         if (mounted) setProfile(data)
-      } else if (mounted) {
-        setProfile(null)
-        setLoading(false)
+      } else {
+        if (mounted) setProfile(null)
       }
+      if (mounted) setLoading(false)
     })
+
     return () => {
       mounted = false
       subscription.unsubscribe()
     }
   }, [])
 
-  const signOut = async () => {
-    await supabase.auth.signOut()
-    setProfile(null)
-  }
-
-  return { profile, loading, signOut, isAdmin: profile?.role === 'admin' }
+  return { profile, loading }
 }
